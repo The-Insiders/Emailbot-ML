@@ -16,6 +16,12 @@ addresses = []
 sub = []
 body = []
 new_contacts = []
+spam_senders = ['guru','sai','shreesh']
+contact_icons = {'a': 'A.png', 'b': 'B.png', 'c': 'C.png', 'd': 'D.png', 'e': 'E.png', 'f': 'F.png',
+                 'g': 'G.png', 'h': 'H.png', 'i': 'I.png', 'j': 'J.png', 'k': 'K.png', 'l': 'L.png',
+                 'm': 'M.png', 'n': 'N.png', 'o': 'O.png', 'p': 'P.png', 'q': 'Q.png', 'r': 'R.png',
+                 's': 'S.png', 't': 'T.png', 'u': 'U.png', 'v': 'V.png', 'w': 'W.png', 'x': 'X.png',
+                 'y': 'Y.png', 'z': 'Z.png'}
 
 wb = xl.load_workbook('contacts.xlsx')
 sheet = wb['Sheet1']
@@ -102,6 +108,8 @@ def new_contact():
 screen_helper = """
 ScreenManager:
     MenuScreen:
+    SelectScreen0:
+    SpamSenders:
     SelectScreen:
     NCScreen:
     SubjectScreen:
@@ -127,8 +135,35 @@ ScreenManager:
     MDRaisedButton:
         text: 'Start'
         pos_hint: {'center_x':0.8,'center_y':0.14}
-        on_press: root.manager.current = 'select'
+        on_press: root.manager.current = 'select0'
         elevation: 10
+<SelectScreen0>:
+    name: 'select0'
+    MDRaisedButton:
+        text: 'Spam Detection'
+        pos_hint: {'center_x':0.5,'center_y':0.4}
+        elevation: 12
+        on_press: root.manager.current = 'spam'
+    MDRaisedButton:
+        text: 'Write Email'
+        pos_hint: {'center_x':0.5,'center_y':0.3}
+        elevation: 12
+        on_press: root.manager.current = 'select'
+<SpamSenders>:
+    name: 'spam'
+    BoxLayout:
+        ScrollView:
+            MDList:
+                id: scroll
+    MDRaisedButton:
+        text: 'Send Mail'
+        pos_hint: {'center_x':0.59,'center_y':0.05}
+        md_bg_color: app.theme_cls.primary_dark
+        elevation: 12
+    MDRectangleFlatButton:
+        text: 'Menu'
+        pos_hint: {'center_x':0.84,'center_y':0.05}
+        on_press: root.manager.current = 'menu'
 <SelectScreen>:
     name: 'select'
     BoxLayout:
@@ -270,6 +305,11 @@ ScreenManager:
 class MenuScreen(Screen):
     pass
 
+class SelectScreen0(Screen):
+    pass
+
+class SpamSenders(Screen):
+    pass
 
 class SelectScreen(Screen):
 
@@ -357,6 +397,8 @@ class EndScreen(Screen):
 # Create the screen manager
 sm = ScreenManager()
 sm.add_widget(MenuScreen(name='menu'))
+sm.add_widget(SelectScreen(name='select0'))
+sm.add_widget(SelectScreen(name='spam'))
 sm.add_widget(SelectScreen(name='select'))
 sm.add_widget(NCScreen(name='new_contact'))
 sm.add_widget(SubjectScreen(name='subject'))
@@ -373,10 +415,15 @@ class DemoApp(MDApp):
         self.help_str = Builder.load_string(screen_helper)
         screen.add_widget(self.help_str)
         for key in contact_list:
-            icons = IconLeftWidget(icon="contact_icon.jpeg")
+            icons = IconLeftWidget(icon="/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/"+contact_icons[key[0]])
             items = TwoLineAvatarListItem(text=key.capitalize(), secondary_text=contact_list[key])
             items.add_widget(icons)
             self.help_str.get_screen('select').ids.scroll.add_widget(items)
+        for address in spam_senders:
+            icons = IconLeftWidget(icon="/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/"+contact_icons[address[0]])
+            items = TwoLineAvatarListItem(text=address)
+            items.add_widget(icons)
+            self.help_str.get_screen('spam').ids.scroll.add_widget(items)
         return screen
 
 
