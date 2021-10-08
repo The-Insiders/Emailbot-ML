@@ -3,12 +3,15 @@ import speech_recognition as sr
 import pyttsx3
 from email.message import EmailMessage
 import openpyxl as xl
+from sklearn.feature_extraction.text import CountVectorizer
+import joblib
 from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.uix.list import TwoLineAvatarListItem, IconLeftWidget, OneLineAvatarIconListItem
 import copy
+
 # for listener to work install pyaudio package
 
 email_receivers = []
@@ -16,12 +19,13 @@ addresses = []
 sub = []
 body = []
 new_contacts = []
-spam_senders = ['guru.sai.shreesh@gmail.com', 'alekhyakanjarla@gmail.com']
+spam_senders = []
 contact_icons = {'a': 'A.png', 'b': 'B.png', 'c': 'C.png', 'd': 'D.png', 'e': 'E.png', 'f': 'F.png',
                  'g': 'G.png', 'h': 'H.png', 'i': 'I.png', 'j': 'J.png', 'k': 'K.png', 'l': 'L.png',
                  'm': 'M.png', 'n': 'N.png', 'o': 'O.png', 'p': 'P.png', 'q': 'Q.png', 'r': 'R.png',
                  's': 'S.png', 't': 'T.png', 'u': 'U.png', 'v': 'V.png', 'w': 'W.png', 'x': 'X.png',
                  'y': 'Y.png', 'z': 'Z.png'}
+
 
 wb = xl.load_workbook('contacts.xlsx')
 sheet = wb['Sheet1']
@@ -31,6 +35,28 @@ for x in range(2, sheet.max_row + 1):
     cell1 = sheet.cell(x, 2)
     cell2 = sheet.cell(x, 3)
     contact_list[cell1.value] = cell2.value
+
+
+cv = joblib.load('vectorizer.joblib')
+
+
+def spam_or_ham(data_tup=(
+[('guru.sai.shreesh', 'you won jackpot'), ('alekhya', 'you won jackpot'), ('charan', 'Hello there'),
+ ('guru.sai.shreesh', 'you won jackpot')])):
+    model = joblib.load('spam_detector.joblib')
+    spam_senders_dict = {}
+    for gmail, subject in data_tup:
+        vector = cv.transform([subject])
+        vector = vector.toarray()
+        prediction = model.predict(vector)
+        if (prediction == 1) and (gmail in spam_senders_dict):
+            spam_senders_dict[gmail] += 1
+        elif (prediction == 1) and (gmail not in spam_senders_dict):
+            spam_senders_dict[gmail] = 1
+    for gmail in spam_senders_dict:
+        spam_senders.append(tuple([spam_senders_dict[gmail], gmail]))
+    spam_senders.sort(reverse=True)
+
 
 listener = sr.Recognizer()
 
@@ -135,7 +161,7 @@ ScreenManager:
     MDRaisedButton:
         text: 'Start'
         pos_hint: {'center_x':0.8,'center_y':0.14}
-        on_press: root.manager.current = 'select0'
+        on_press: root.manager.current = 'select0' 
         elevation: 10
 <SelectScreen0>:
     name: 'select0'
@@ -305,11 +331,14 @@ ScreenManager:
 class MenuScreen(Screen):
     pass
 
+
 class SelectScreen0(Screen):
     pass
 
+
 class SpamSenders(Screen):
-    pass
+    spam_or_ham()
+
 
 class SelectScreen(Screen):
 
@@ -415,12 +444,14 @@ class DemoApp(MDApp):
         self.help_str = Builder.load_string(screen_helper)
         screen.add_widget(self.help_str)
         for key in contact_list:
-            icons = IconLeftWidget(icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[key[0]]}")
+            icons = IconLeftWidget(
+                icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[key[0]]}")
             items = TwoLineAvatarListItem(text=key.capitalize(), secondary_text=contact_list[key])
             items.add_widget(icons)
             self.help_str.get_screen('select').ids.scroll.add_widget(items)
-        for address in spam_senders:
-            icons = IconLeftWidget(icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[address[0]]}")
+        for spam_num, address in spam_senders:
+            icons = IconLeftWidget(
+                icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[address[0]]}")
             items = OneLineAvatarIconListItem(text=address)
             items.add_widget(icons)
             self.help_str.get_screen('spam').ids.scroll.add_widget(items)
