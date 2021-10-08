@@ -7,7 +7,7 @@ from kivymd.app import MDApp
 from kivy.core.window import Window
 from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivymd.uix.list import TwoLineAvatarListItem, IconLeftWidget
+from kivymd.uix.list import TwoLineAvatarListItem, IconLeftWidget, OneLineAvatarIconListItem
 import copy
 # for listener to work install pyaudio package
 
@@ -16,7 +16,7 @@ addresses = []
 sub = []
 body = []
 new_contacts = []
-spam_senders = ['guru', 'sai', 'shreesh']
+spam_senders = ['guru.sai.shreesh@gmail.com', 'alekhyakanjarla@gmail.com']
 contact_icons = {'a': 'A.png', 'b': 'B.png', 'c': 'C.png', 'd': 'D.png', 'e': 'E.png', 'f': 'F.png',
                  'g': 'G.png', 'h': 'H.png', 'i': 'I.png', 'j': 'J.png', 'k': 'K.png', 'l': 'L.png',
                  'm': 'M.png', 'n': 'N.png', 'o': 'O.png', 'p': 'P.png', 'q': 'Q.png', 'r': 'R.png',
@@ -421,7 +421,7 @@ class DemoApp(MDApp):
             self.help_str.get_screen('select').ids.scroll.add_widget(items)
         for address in spam_senders:
             icons = IconLeftWidget(icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[address[0]]}")
-            items = TwoLineAvatarListItem(text=address)
+            items = OneLineAvatarIconListItem(text=address)
             items.add_widget(icons)
             self.help_str.get_screen('spam').ids.scroll.add_widget(items)
         return screen
