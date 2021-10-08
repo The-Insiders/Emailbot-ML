@@ -16,7 +16,7 @@ addresses = []
 sub = []
 body = []
 new_contacts = []
-spam_senders = ['guru','sai','shreesh']
+spam_senders = ['guru', 'sai', 'shreesh']
 contact_icons = {'a': 'A.png', 'b': 'B.png', 'c': 'C.png', 'd': 'D.png', 'e': 'E.png', 'f': 'F.png',
                  'g': 'G.png', 'h': 'H.png', 'i': 'I.png', 'j': 'J.png', 'k': 'K.png', 'l': 'L.png',
                  'm': 'M.png', 'n': 'N.png', 'o': 'O.png', 'p': 'P.png', 'q': 'Q.png', 'r': 'R.png',
@@ -314,7 +314,7 @@ class SpamSenders(Screen):
 class SelectScreen(Screen):
 
     def receiver_addresses(self):
-        while(1):
+        while 1:
             receivers_str = mike_out()
             receivers = receivers_str.split(' and ')
             for receiver in receivers:
@@ -415,12 +415,12 @@ class DemoApp(MDApp):
         self.help_str = Builder.load_string(screen_helper)
         screen.add_widget(self.help_str)
         for key in contact_list:
-            icons = IconLeftWidget(icon="/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/"+contact_icons[key[0]])
+            icons = IconLeftWidget(icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[key[0]]}")
             items = TwoLineAvatarListItem(text=key.capitalize(), secondary_text=contact_list[key])
             items.add_widget(icons)
             self.help_str.get_screen('select').ids.scroll.add_widget(items)
         for address in spam_senders:
-            icons = IconLeftWidget(icon="/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/"+contact_icons[address[0]])
+            icons = IconLeftWidget(icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[address[0]]}")
             items = TwoLineAvatarListItem(text=address)
             items.add_widget(icons)
             self.help_str.get_screen('spam').ids.scroll.add_widget(items)
