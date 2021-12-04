@@ -32,6 +32,7 @@ wb = xl.load_workbook('contacts.xlsx')
 sheet = wb['Sheet1']
 contact_list = {}
 x = 2
+
 for x in range(2, sheet.max_row + 1):
     cell1 = sheet.cell(x, 2)
     cell2 = sheet.cell(x, 3)
@@ -390,7 +391,6 @@ class SpamSenders(Screen):
         gather_and_send()
 
 
-
 class SelectScreen(Screen):
 
     def receiver_addresses(self):
@@ -484,6 +484,7 @@ sm.add_widget(NCScreen(name='new_contact'))
 sm.add_widget(SubjectScreen(name='subject'))
 sm.add_widget(BodyScreen(name='body'))
 sm.add_widget(EndScreen(name='end'))
+
 
 Window.size = (360, 600)
 
