@@ -1,9 +1,11 @@
 import smtplib
+import imaplib
 import speech_recognition as sr
 import pyttsx3
+import email
 from email.message import EmailMessage
+from email.header import decode_header
 import openpyxl as xl
-from sklearn.feature_extraction.text import CountVectorizer
 import joblib
 from kivymd.app import MDApp
 from kivy.core.window import Window
@@ -26,7 +28,6 @@ contact_icons = {'a': 'A.png', 'b': 'B.png', 'c': 'C.png', 'd': 'D.png', 'e': 'E
                  's': 'S.png', 't': 'T.png', 'u': 'U.png', 'v': 'V.png', 'w': 'W.png', 'x': 'X.png',
                  'y': 'Y.png', 'z': 'Z.png'}
 
-
 wb = xl.load_workbook('contacts.xlsx')
 sheet = wb['Sheet1']
 contact_list = {}
@@ -36,13 +37,11 @@ for x in range(2, sheet.max_row + 1):
     cell2 = sheet.cell(x, 3)
     contact_list[cell1.value] = cell2.value
 
-
 cv = joblib.load('vectorizer.joblib')
 
 
-def spam_or_ham(data_tup=(
-[('guru.sai.shreesh', 'you won jackpot'), ('alekhya', 'you won jackpot'), ('charan', 'Hello there'),
- ('guru.sai.shreesh', 'you won jackpot')])):
+def spam_or_ham():
+    data_tup = import_subject()
     model = joblib.load('spam_detector.joblib')
     spam_senders_dict = {}
     for gmail, subject in data_tup:
@@ -93,6 +92,7 @@ def send_email(receiver, subject, message):
     email['Subject'] = subject
     email.set_content(message)
     server.send_message(email)
+    server.close()
 
 
 def gather_and_send():
@@ -116,6 +116,10 @@ def gather_and_send():
     for receiver in unique_addresses:
         send_email(receiver, subject0, body0)
     print('Email sent successfully to', *unique_addresses)
+    email_receivers.clear()
+    addresses.clear()
+    sub.clear()
+    body.clear()
 
 
 def new_contact():
@@ -129,6 +133,42 @@ def new_contact():
         new_cell2.value = email
         wb.save('contacts.xlsx')
     wb.close()
+
+
+def import_subject():
+    username = "gojo.testing123@gmail.com"
+    password = "hellogojo"
+    data_tup = []
+    # create an IMAP4 class with SSL
+    imap = imaplib.IMAP4_SSL("imap.gmail.com")
+    # authenticate
+    imap.login(username, password)
+    status, messages = imap.select("INBOX")
+
+    # number of top emails to fetch
+    n = 10
+    # total number of emails
+    messages = int(messages[0])
+    for i in range(messages, messages - n, -1):
+        # fetch the email message by ID
+        res, msg = imap.fetch(str(i), "(RFC822)")
+        for response in msg:
+            if isinstance(response, tuple):
+                # parse a bytes email into a message object
+                msg = email.message_from_bytes(response[1])
+                # decode the email subject
+                subject, encoding = decode_header(msg["Subject"])[0]
+                if isinstance(subject, bytes):
+                    # if it's a bytes, decode to str
+                    subject = subject.decode(encoding)
+                # decode email sender
+                From, encoding = decode_header(msg.get("From"))[0]
+                if isinstance(From, bytes):
+                    From = From.decode(encoding)
+                print("Subject:", subject)
+                print("From:", From)
+                data_tup.append(tuple([From, subject]))
+    return data_tup
 
 
 screen_helper = """
@@ -186,6 +226,7 @@ ScreenManager:
         pos_hint: {'center_x':0.59,'center_y':0.05}
         md_bg_color: app.theme_cls.primary_dark
         elevation: 12
+        on_press: root.mail_spammers()
     MDRectangleFlatButton:
         text: 'Menu'
         pos_hint: {'center_x':0.84,'center_y':0.05}
@@ -338,6 +379,16 @@ class SelectScreen0(Screen):
 
 class SpamSenders(Screen):
     spam_or_ham()
+    def mail_spammers(self):
+        addresses.append("gojo.testing123@gmail.com")
+        sub.append("Email spam senders!!")
+        spam_mailbod = ""
+        i = 1
+        for spam_num, address in spam_senders:
+            spam_mailbod += str(i)+") " + address + " spam mails sent- " + str(spam_num) + "\n"
+        body.append(spam_mailbod)
+        gather_and_send()
+
 
 
 class SelectScreen(Screen):
@@ -451,7 +502,7 @@ class DemoApp(MDApp):
             self.help_str.get_screen('select').ids.scroll.add_widget(items)
         for spam_num, address in spam_senders:
             icons = IconLeftWidget(
-                icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[address[0]]}")
+                icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[address[0].lower()]}")
             items = OneLineAvatarIconListItem(text=address)
             items.add_widget(icons)
             self.help_str.get_screen('spam').ids.scroll.add_widget(items)
