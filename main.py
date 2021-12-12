@@ -190,45 +190,107 @@ ScreenManager:
         mipmap: True
         allow_stretch: True
         pos_hint: {'center_x':0.5,'center_y':0.5}
+    MDCard:
+        size_hint: None, None
+        size: "180dp", "70dp"
+        pos_hint: {"center_x": 0.33, "center_y": 0.89}
+        canvas.before:
+            Color:
+                rgba: app.theme_cls.primary_color
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [10]
+        FloatLayout:
+            size: self.size
+            pos: self.pos
+            pos_hint: {"center_x": 0.33, "center_y": 0.89}
     MDLabel:
         id: head
-        text: 'EMAIL BOT'
+        text: 'HOWDY'
         bold: True
         halign: 'center'
         bold: True
         font_size: '30sp'
-        pos_hint: {'center_x':0.34,'center_y':0.83}
-        color: 0.16, 0.47, 0.45, 1
-    MDRaisedButton:
-        text: 'Start'
+        pos_hint: {'center_x':0.3,'center_y':0.89}
+        color: 0.9, 0.9, 0.9, 1
+    MDFillRoundFlatButton:
+        text: 'BEGIN'
         pos_hint: {'center_x':0.8,'center_y':0.14}
         on_press: root.manager.current = 'select0' 
-        elevation: 10
+
 <SelectScreen0>:
     name: 'select0'
-    MDRaisedButton:
+    MDCard:
+        size_hint: None, None
+        size: "260dp", "180dp"
         text: 'Spam Detection'
-        pos_hint: {'center_x':0.5,'center_y':0.4}
-        elevation: 12
+        pos_hint: {"center_x": 0.5, "center_y": 0.33}
+        ripple_behavior: True
         on_press: root.manager.current = 'spam'
-    MDRaisedButton:
+        canvas.before:
+            Color:
+                rgba: app.theme_cls.primary_color
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [10]
+        FloatLayout:
+            size: self.size
+            pos: self.pos
+            pos_hint: {"center_x": 0.5, "center_y": 0.33}
+            elevation: 6
+    MDLabel:
+        text: 'SPAM'
+        bold: True
+        font_size: '30sp'
+        pos_hint: {"center_x": 0.65, "center_y": 0.335}
+        color: 1, 1, 1, 1 
+    MDLabel:
+        text: 'DETECTION'
+        bold: True
+        font_size: '30sp'
+        pos_hint: {"center_x": 0.65, "center_y": 0.285}
+        color: 1, 1, 1, 1      
+    MDCard:
+        size_hint: None, None
+        size: "260dp", "180dp"
         text: 'Write Email'
-        pos_hint: {'center_x':0.5,'center_y':0.3}
-        elevation: 12
+        pos_hint: {"center_x": 0.5, "center_y": 0.66}
+        ripple_behavior: True
         on_press: root.manager.current = 'select'
+        canvas.before:
+            Color:
+                rgba: app.theme_cls.primary_color
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [10]
+        FloatLayout:
+            size: self.size
+            pos: self.pos
+            pos_hint: {"center_x": 0.5, "center_y": 0.66}
+            elevation: 6
+    MDLabel:
+        text: 'WRITE EMAIL'
+        bold: True
+        font_size: '30sp'
+        pos_hint: {"center_x": 0.65, "center_y": 0.66}
+        color: 1, 1, 1, 1
+        
 <SpamSenders>:
     name: 'spam'
     BoxLayout:
         ScrollView:
             MDList:
                 id: scroll
-    MDRaisedButton:
+    MDFillRoundFlatButton:
         text: 'Send Mail'
         pos_hint: {'center_x':0.59,'center_y':0.05}
         md_bg_color: app.theme_cls.primary_dark
         elevation: 12
         on_press: root.mail_spammers()
-    MDRectangleFlatButton:
+    MDFillRoundFlatButton:
         text: 'Menu'
         pos_hint: {'center_x':0.84,'center_y':0.05}
         on_press: root.manager.current = 'menu'
@@ -238,19 +300,18 @@ ScreenManager:
         ScrollView:
             MDList:
                 id: scroll
-    MDRaisedButton:
-        text: 'New contact'
-        pos_hint: {'center_x':0.2,'center_y':0.05}
+    MDFillRoundFlatButton:
+        text: 'Add contact'
+        pos_hint: {'center_x':0.185,'center_y':0.05}
         on_press: root.manager.current = 'new_contact'
-    MDRaisedButton:
-        text: 'Speak names to add'
-        pos_hint: {'center_x':0.58,'center_y':0.05}
-        md_bg_color: app.theme_cls.primary_dark
-        elevation: 12
+    MDFillRoundFlatButton:
+        text: 'Record VoiceOver'
+        pos_hint: {'center_x':0.55,'center_y':0.05}
         on_press: root.receiver_addresses()
-    MDRectangleFlatButton:
+    MDFillRoundFlatButton:
         text: 'Next'
-        pos_hint: {'center_x':0.88,'center_y':0.05}
+        pos_hint: {'center_x':0.895,'center_y':0.05}
+        md_bg_color: app.theme_cls.primary_dark
         on_press: root.manager.current = 'subject'
 
 <NCScreen>:
@@ -262,16 +323,14 @@ ScreenManager:
         halign: 'center'
         bold: True
         font_size: '20sp'
-        pos_hint: {'center_y':0.7}
-        color: 0, 0, 1, 1
+        pos_hint: {'center_y':0.65}
+        color: app.theme_cls.primary_dark
     MDLabel:
         id: head
-        text: 'You can add multiple contacts by saving them in pairs'
-        bold: True
+        text: 'Multiple contacts can be Saved'
         halign: 'center'
-        bold: True
         pos_hint: {'center_y':0.6}
-        color: 0.16, 0.47, 0.45, 1
+        color: 0.8, 0.8, 0.8, 1
     MDTextField:
         id: name
         hint_text: "Enter name"
@@ -281,7 +340,7 @@ ScreenManager:
         pos_hint:{'center_x': 0.5, 'center_y': 0.5}
         color_mode: 'custom'
         mode: "rectangle"
-        line_color_focus: 0, 0, 0.9, 1
+        line_color_focus: app.theme_cls.primary_color
         size_hint_x:None
         width:500
     MDTextField:
@@ -293,79 +352,99 @@ ScreenManager:
         pos_hint:{'center_x': 0.5, 'center_y': 0.4}
         color_mode: 'custom'
         mode: "rectangle"
-        line_color_focus: 0, 0, 0.9, 1
+        line_color_focus: app.theme_cls.primary_color
         size_hint_x:None
         width:500
-    MDRaisedButton:
+    MDFillRoundFlatButton:
         text: 'Save'
         pos_hint: {'center_x': 0.5, 'center_y': 0.3}
         on_release: root.save_data()
-    MDRectangleFlatButton:
+    MDFillRoundFlatButton:
         text: 'Next'
         pos_hint: {'center_x': 0.88, 'center_y': 0.05}
+        md_bg_color: app.theme_cls.primary_dark
         on_release: root.manager.current = 'subject'
 <SubjectScreen>:
     name: 'subject'
     MDLabel:
-        text: 'Subject:'
+        text: 'SUBJECT:'
         bold: True
         halign: 'center'
-        pos_hint: {'center_x':0.13,'center_y':0.95}
-        color: 0.16, 0.47, 0.45, 1
-    MDRectangleFlatButton:
+        pos_hint: {'center_x':0.148,'center_y':0.95}
+        color: app.theme_cls.primary_dark
+    MDRoundFlatButton:
         id: sub
-        text: "Press on 'start listening' to speak subject"
+        text: "Click on 'Record VoiceOver' generate Subject"
         pos_hint: {'center_x':0.5,'center_y':0.5}
-        size_hint: 0.9, 0.8
-    MDRaisedButton:
-        text: 'Start listening'
-        pos_hint: {'center_x':0.8,'center_y':0.95}
+        size_hint: 0.92, 0.82
+    MDFillRoundFlatButton:
+        text: 'Record VoiceOver'
+        pos_hint: {'center_x':0.74,'center_y':0.95}
         md_bg_color: app.theme_cls.primary_dark
         on_press: root.listen_subject()
-    MDRaisedButton:
+    MDFillRoundFlatButton:
         text: 'Next'
         pos_hint: {'center_x':0.87,'center_y':0.05}
         on_press: root.manager.current = 'body'
 <BodyScreen>:
     name: 'body'
     MDLabel:
-        text: 'Email Body: '
+        text: 'EMAIL BODY:'
         bold: True
         halign: 'center'
-        pos_hint: {'center_x':0.18,'center_y':0.95}
-        color: 0.16, 0.47, 0.45, 1
-    MDRectangleFlatButton:
+        pos_hint: {'center_x':0.2,'center_y':0.95}
+        color: app.theme_cls.primary_dark
+    MDRoundFlatButton:
         id: ebod
-        text: "Press on 'start listening' to speak BODY"
+        text: "Click on 'Record VoiceOver' generate Body"
         pos_hint: {'center_x':0.5,'center_y':0.5}
-        size_hint: 0.9, 0.8
-    MDRaisedButton:
-        text: 'Start listening'
-        pos_hint: {'center_x':0.8,'center_y':0.95}
+        size_hint: 0.92, 0.82
+    MDFillRoundFlatButton:
+        text: 'Record VoiceOver'
+        pos_hint: {'center_x':0.74,'center_y':0.95}
         md_bg_color: app.theme_cls.primary_dark
         on_press: root.listen_body()
-    MDRaisedButton:
+    MDFillRoundFlatButton:
         text: 'Next'
         pos_hint: {'center_x':0.87,'center_y':0.05}
         on_press: root.manager.current = 'end'
 <EndScreen>:
     name: 'end'
     MDLabel:
-        text: "Press on 'Send' button to send composed Email"
-        pos_hint: {'center_x':0.54,'center_y':0.66}
-        color: 0.16, 0.47, 0.45, 1
-    MDRaisedButton:
-        text: 'Send'
-        pos_hint: {'center_x':0.5,'center_y':0.6}
+        text: "Click on 'Send Mail'"
+        pos_hint: {'center_x':0.64,'center_y':0.86}
+        color: 0.8, 0.8, 0.8, 1
+    MDFillRoundFlatButton:
+        text: 'Send Mail'
+        pos_hint: {'center_x':0.7,'center_y':0.86}
         on_press: root.final_send()
+    MDCard:
+        size_hint: None, None
+        size: "260dp", "320dp"
+        pos_hint: {"center_x": 0.5, "center_y": 0.5}
+        canvas.before:
+            Color:
+                rgba: app.theme_cls.primary_color
+            RoundedRectangle:
+                size: self.size
+                pos: self.pos
+                radius: [10]
+        FloatLayout:
+            size: self.size
+            pos: self.pos
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            elevation: 6
+    MDLabel:
+        text: 'Email(s) successfully sent to:'
+        bold: True
+        halign: 'center'
+        pos_hint: {'center_x':0.5,'center_y':0.7}
+        color: 1, 1, 1, 1
     MDLabel:
         id: final
         halign: 'center'
-        pos_hint: {'center_x':0.5,'center_y':0.5}
-    MDLabel:
-        id: notify
-        pos_hint: {'center_x':0.57,'center_y':0.05}
-        color: 0.16, 0.47, 0.45, 1
+        pos_hint: {'center_x':0.5,'center_y':0.65}
+        color: 1, 1, 1, 1
 
 """
 
@@ -386,7 +465,7 @@ class SpamSenders(Screen):
         spam_mailbod = ""
         i = 1
         for spam_num, address in spam_senders:
-            spam_mailbod += str(i)+") " + address + " spam mails sent- " + str(spam_num) + "\n"
+            spam_mailbod += str(i)+". " + address + "\tspam mails sent - " + str(spam_num) + "\n"
         body.append(spam_mailbod)
         gather_and_send()
 
@@ -394,17 +473,14 @@ class SpamSenders(Screen):
 class SelectScreen(Screen):
 
     def receiver_addresses(self):
-        while 1:
-            receivers_str = mike_out()
-            receivers = receivers_str.split(' and ')
-            for receiver in receivers:
-                if receiver not in contact_list:
-                    receivers.remove(receiver)
-            if len(receivers) == 0:
-                talk("sorry, there are no similar email addresses in your contacts")
-                talk("Please try again")
-            else:
-                break
+        receivers_str = mike_out()
+        receivers = receivers_str.split(' and ')
+        for receiver in receivers:
+            if receiver not in contact_list:
+                receivers.remove(receiver)
+        if len(receivers) == 0:
+            talk("sorry, there are no similar email addresses in your contacts")
+            talk("Please try again")
 
         for receiver in receivers:
             email_receivers.append(receiver.capitalize())
@@ -470,8 +546,8 @@ class EndScreen(Screen):
         final_msg_names = ""
         unique_receivers = list(set(email_receivers))
         for receiver in unique_receivers:
-            final_msg_names += (' ' + receiver)
-        self.ids.final.text = "Email(s) successfully sent to\n" + final_msg_names
+            final_msg_names += (receiver+'\n')
+        self.ids.final.text = final_msg_names
 
 
 # Create the screen manager
@@ -486,7 +562,7 @@ sm.add_widget(BodyScreen(name='body'))
 sm.add_widget(EndScreen(name='end'))
 
 
-Window.size = (360, 600)
+Window.size = (330, 600)
 
 
 class DemoApp(MDApp):
