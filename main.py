@@ -71,15 +71,18 @@ def talk(text):
 
 
 def mike_out():
+    with sr.Microphone() as source:
+        print("Adjusting noise ")
+        listener.adjust_for_ambient_noise(source, duration=1)
+        print("Listening..")
+        recorded_audio = listener.listen(source)
+        print("Done recording")
     try:
-        with sr.Microphone() as source:
-            print('listening...')
-            voice = listener.listen(source)
-            info = listener.recognize_google(voice)
-            print(info)
-            return info.lower()
-    except:
-        pass
+        info = listener.recognize_google(recorded_audio, language="en-US")
+        print(info)
+        return info.lower()
+    except Exception as ex:
+        print(ex)
 
 
 def send_email(receiver, subject, message):
@@ -117,10 +120,6 @@ def gather_and_send():
     for receiver in unique_addresses:
         send_email(receiver, subject0, body0)
     print('Email sent successfully to', *unique_addresses)
-    email_receivers.clear()
-    addresses.clear()
-    sub.clear()
-    body.clear()
 
 
 def new_contact():
@@ -182,6 +181,7 @@ ScreenManager:
     SubjectScreen:
     BodyScreen:
     EndScreen:
+
 <MenuScreen>:
     name: 'menu'
     Image:
@@ -275,7 +275,7 @@ ScreenManager:
         text: 'WRITE EMAIL'
         bold: True
         font_size: '30sp'
-        pos_hint: {"center_x": 0.65, "center_y": 0.66}
+        pos_hint: {"center_x": 0.65, "center_y": 0.63}
         color: 1, 1, 1, 1
         
 <SpamSenders>:
@@ -293,7 +293,8 @@ ScreenManager:
     MDFillRoundFlatButton:
         text: 'Menu'
         pos_hint: {'center_x':0.84,'center_y':0.05}
-        on_press: root.manager.current = 'menu'
+        on_press: root.manager.current = 'select0'
+
 <SelectScreen>:
     name: 'select'
     BoxLayout:
@@ -334,24 +335,24 @@ ScreenManager:
     MDTextField:
         id: name
         hint_text: "Enter name"
-        helper_text: "and Enter Email address"
+        helper_text: "Enter contact name"
         helper_text_mode: "on_focus"
         icon_right_color: app.theme_cls.primary_color
         pos_hint:{'center_x': 0.5, 'center_y': 0.5}
         color_mode: 'custom'
-        mode: "rectangle"
+        line_color_normal: app.theme_cls.primary_color
         line_color_focus: app.theme_cls.primary_color
         size_hint_x:None
         width:500
     MDTextField:
         id: address
         hint_text: "Enter email address"
-        helper_text: "or click on Next"
+        helper_text: "Click on save"
         helper_text_mode: "on_focus"
         icon_right_color: app.theme_cls.primary_color
         pos_hint:{'center_x': 0.5, 'center_y': 0.4}
         color_mode: 'custom'
-        mode: "rectangle"
+        line_color_normal: app.theme_cls.primary_color
         line_color_focus: app.theme_cls.primary_color
         size_hint_x:None
         width:500
@@ -364,6 +365,7 @@ ScreenManager:
         pos_hint: {'center_x': 0.88, 'center_y': 0.05}
         md_bg_color: app.theme_cls.primary_dark
         on_release: root.manager.current = 'subject'
+
 <SubjectScreen>:
     name: 'subject'
     MDLabel:
@@ -386,6 +388,7 @@ ScreenManager:
         text: 'Next'
         pos_hint: {'center_x':0.87,'center_y':0.05}
         on_press: root.manager.current = 'body'
+
 <BodyScreen>:
     name: 'body'
     MDLabel:
@@ -408,6 +411,7 @@ ScreenManager:
         text: 'Next'
         pos_hint: {'center_x':0.87,'center_y':0.05}
         on_press: root.manager.current = 'end'
+
 <EndScreen>:
     name: 'end'
     MDLabel:
@@ -442,10 +446,15 @@ ScreenManager:
         color: 1, 1, 1, 1
     MDLabel:
         id: final
+        bold: True
         halign: 'center'
-        pos_hint: {'center_x':0.5,'center_y':0.65}
+        pos_hint: {'center_x':0.5,'center_y':0.625}
         color: 1, 1, 1, 1
-
+    MDFillRoundFlatButton:
+        text: 'Menu'
+        pos_hint: {'center_x':0.84,'center_y':0.05}
+        on_press: root.manager.current = 'select0'
+        
 """
 
 
@@ -459,28 +468,43 @@ class SelectScreen0(Screen):
 
 class SpamSenders(Screen):
     spam_or_ham()
+
     def mail_spammers(self):
         addresses.append("gojo.testing123@gmail.com")
         sub.append("Email spam senders!!")
-        spam_mailbod = ""
+        spam_mailbod = "Spam mail senders are:\n"
         i = 1
-        for spam_num, address in spam_senders:
-            spam_mailbod += str(i)+". " + address + "\tspam mails sent - " + str(spam_num) + "\n"
+        for spam_num, name_address in spam_senders:
+            if '<' in name_address:
+                name_address = name_address.split("<")
+                spam_mailbod += str(i) + ". Email address- " + (name_address[1])[:-1] + "\tName- " + name_address[0]
+                spam_mailbod += "\nNo.of Spams sent- " + str(spam_num) + "\n"
+                i += 1
+            else:
+                spam_mailbod += str(i) + ". Email address- " + name_address
+                spam_mailbod += "\nNo.of Spams sent- " + str(spam_num) + "\n"
         body.append(spam_mailbod)
         gather_and_send()
+        email_receivers.clear()
+        addresses.clear()
+        sub.clear()
+        body.clear()
 
 
 class SelectScreen(Screen):
 
     def receiver_addresses(self):
-        receivers_str = mike_out()
-        receivers = receivers_str.split(' and ')
-        for receiver in receivers:
-            if receiver not in contact_list:
-                receivers.remove(receiver)
-        if len(receivers) == 0:
-            talk("sorry, there are no similar email addresses in your contacts")
-            talk("Please try again")
+        while 1:
+            receivers_str = mike_out()
+            receivers = receivers_str.split(' and ')
+            for receiver in receivers:
+                if receiver not in contact_list:
+                    receivers.remove(receiver)
+            if len(receivers) == 0:
+                talk("sorry, there are no similar email addresses in your contacts")
+                talk("Please try again")
+            else:
+                break
 
         for receiver in receivers:
             email_receivers.append(receiver.capitalize())
@@ -546,8 +570,12 @@ class EndScreen(Screen):
         final_msg_names = ""
         unique_receivers = list(set(email_receivers))
         for receiver in unique_receivers:
-            final_msg_names += (receiver+'\n')
+            final_msg_names += (receiver + '\n')
         self.ids.final.text = final_msg_names
+        email_receivers.clear()
+        addresses.clear()
+        sub.clear()
+        body.clear()
 
 
 # Create the screen manager
@@ -580,7 +608,7 @@ class DemoApp(MDApp):
         for spam_num, address in spam_senders:
             icons = IconLeftWidget(
                 icon=f"/Users/gurusaishreeshtirumalla/Desktop/Emailbot-ML/Alphabets/{contact_icons[address[0].lower()]}")
-            items = OneLineAvatarIconListItem(text=address)
+            items = OneLineAvatarIconListItem(text=(address.split("<"))[0])
             items.add_widget(icons)
             self.help_str.get_screen('spam').ids.scroll.add_widget(items)
         return screen
